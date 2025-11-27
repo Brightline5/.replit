@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Settings, Bell, Shield, Brain, Clock, DollarSign, Users, Mail } from 'lucide-react';
+import { Settings, Bell, Shield, Brain, Clock, Users, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
