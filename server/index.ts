@@ -5,7 +5,7 @@ import { setupVite, serveStatic, log } from "./vite";
 
 declare module "express-session" {
   interface SessionData {
-    isAuthenticated: boolean;
+    user: { role: string };
   }
 }
 
