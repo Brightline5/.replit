@@ -14,9 +14,9 @@ import Sidebar from "@/components/sidebar";
 
 function Router() {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-auto">
         <Switch>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
