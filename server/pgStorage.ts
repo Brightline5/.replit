@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+// server/pgStorage.ts
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { eq, sql } from "drizzle-orm";
@@ -34,6 +34,7 @@ export class PgStorage implements IStorage {
     this.db = drizzle(this.pool);
   }
 
+  // STAFF
   async getStaff(): Promise<Staff[]> {
     const rows = await this.db.select().from(staffTable).where(eq(staffTable.isActive, true));
     return rows as unknown as Staff[];
@@ -45,24 +46,18 @@ export class PgStorage implements IStorage {
   }
 
   async createStaff(insertStaff: InsertStaff): Promise<Staff> {
-    const id = randomUUID();
-    const now = new Date();
-    await this.db.insert(staffTable).values({
-      id,
+    const result = await this.db.insert(staffTable).values({
       name: insertStaff.name,
       position: insertStaff.position,
       hourlyRate: insertStaff.hourlyRate,
-      email: insertStaff.email ?? null,
+      email: insertStaff.email ?? "",
       phone: insertStaff.phone ?? null,
       availability: insertStaff.availability ?? {},
       skills: insertStaff.skills ?? [],
       isActive: insertStaff.isActive ?? true,
-      createdAt: now,
-    } as any);
+    } as any).returning();
 
-    const created = await this.getStaffById(id);
-    if (!created) throw new Error("Failed to create staff");
-    return created;
+    return result[0] as Staff;
   }
 
   async updateStaff(id: string, updates: Partial<InsertStaff>): Promise<Staff | undefined> {
@@ -75,11 +70,12 @@ export class PgStorage implements IStorage {
     return true;
   }
 
+  // SHIFTS
   async getShifts(filters?: { date?: string; staffId?: string }): Promise<Shift[]> {
-    let query = this.db.select().from(shiftsTable).$dynamic();
-    if (filters?.date) query = query.where(eq(shiftsTable.date, filters.date));
-    if (filters?.staffId) query = query.where(eq(shiftsTable.staffId, filters.staffId));
-    const rows = await query;
+    let q = this.db.select().from(shiftsTable);
+    if (filters?.date) q = q.where(eq(shiftsTable.date, filters.date)) as any;
+    if (filters?.staffId) q = q.where(eq(shiftsTable.staffId, filters.staffId)) as any;
+    const rows = await q;
     return rows as unknown as Shift[];
   }
 
@@ -89,19 +85,17 @@ export class PgStorage implements IStorage {
   }
 
   async createShift(insertShift: InsertShift): Promise<Shift> {
-    const id = randomUUID();
-    const now = new Date();
-    await this.db.insert(shiftsTable).values({
-      ...insertShift,
-      id,
-      createdAt: now,
+    const result = await this.db.insert(shiftsTable).values({
+      staffId: insertShift.staffId,
+      date: insertShift.date,
+      startTime: insertShift.startTime,
+      endTime: insertShift.endTime,
+      position: insertShift.position,
       status: insertShift.status ?? "scheduled",
       notes: insertShift.notes ?? null,
-    } as any);
+    }).returning();
 
-    const created = await this.getShiftById(id);
-    if (!created) throw new Error("Failed to create shift");
-    return created;
+    return result[0] as Shift;
   }
 
   async updateShift(id: string, updates: Partial<InsertShift>): Promise<Shift | undefined> {
@@ -114,26 +108,27 @@ export class PgStorage implements IStorage {
     return true;
   }
 
+  // DEMAND FORECASTS
   async getDemandForecasts(dateRange?: { start: string; end: string }): Promise<DemandForecast[]> {
-    let query = this.db.select().from(demandForecastsTable).$dynamic();
+    let q = this.db.select().from(demandForecastsTable);
     if (dateRange) {
-      query = query.where(sql`${demandForecastsTable.date} >= ${dateRange.start} AND ${demandForecastsTable.date} <= ${dateRange.end}`);
+      q = q.where(sql`${demandForecastsTable.date} >= ${dateRange.start} AND ${demandForecastsTable.date} <= ${dateRange.end}`) as any;
     }
-    const rows = await query;
+    const rows = await q;
     return (rows as unknown as DemandForecast[]).sort((a, b) => a.date.localeCompare(b.date));
   }
 
   async createDemandForecast(forecast: InsertDemandForecast): Promise<DemandForecast> {
-    const id = randomUUID();
-    const now = new Date();
-    await this.db.insert(demandForecastsTable).values({
-      ...forecast,
-      id,
-      createdAt: now,
+    const result = await this.db.insert(demandForecastsTable).values({
+      date: forecast.date,
+      timeSlot: forecast.timeSlot,
+      predictedDemand: forecast.predictedDemand,
       actualDemand: forecast.actualDemand ?? null,
-    } as any);
-    const rows = await this.db.select().from(demandForecastsTable).where(eq(demandForecastsTable.id, id));
-    return rows[0] as DemandForecast;
+      staffingRecommendation: forecast.staffingRecommendation,
+      confidence: forecast.confidence,
+    }).returning();
+
+    return result[0] as DemandForecast;
   }
 
   async updateActualDemand(id: string, actualDemand: number): Promise<DemandForecast | undefined> {
@@ -142,6 +137,7 @@ export class PgStorage implements IStorage {
     return rows[0] as DemandForecast | undefined;
   }
 
+  // SCHEDULE TEMPLATES
   async getScheduleTemplates(): Promise<ScheduleTemplate[]> {
     const rows = await this.db.select().from(scheduleTemplatesTable);
     return rows as unknown as ScheduleTemplate[];
@@ -153,43 +149,39 @@ export class PgStorage implements IStorage {
   }
 
   async createScheduleTemplate(template: InsertScheduleTemplate): Promise<ScheduleTemplate> {
-    const id = randomUUID();
-    const now = new Date();
-    await this.db.insert(scheduleTemplatesTable).values({
-      ...template,
-      id,
-      createdAt: now,
+    const result = await this.db.insert(scheduleTemplatesTable).values({
+      name: template.name,
       description: template.description ?? null,
+      template: template.template,
       isDefault: template.isDefault ?? false,
-    } as any);
-    const rows = await this.db.select().from(scheduleTemplatesTable).where(eq(scheduleTemplatesTable.id, id));
-    return rows[0] as ScheduleTemplate;
+    } as any).returning();
+
+    return result[0] as ScheduleTemplate;
   }
 
+  // AI Recommendations
   async getAiRecommendations(filters?: { isRead?: boolean }): Promise<AiRecommendation[]> {
-    let query = this.db.select().from(aiRecommendationsTable).$dynamic();
-    if (filters?.isRead !== undefined) query = query.where(eq(aiRecommendationsTable.isRead, filters.isRead));
-    const rows = await query;
+    let q = this.db.select().from(aiRecommendationsTable);
+    if (filters?.isRead !== undefined) q = q.where(eq(aiRecommendationsTable.isRead, filters.isRead)) as any;
+    const rows = await q;
     return (rows as unknown as AiRecommendation[]).sort((a, b) => {
-      const aT = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bT = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bT - aT;
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
     });
   }
 
   async createAiRecommendation(recommendation: InsertAiRecommendation): Promise<AiRecommendation> {
-    const id = randomUUID();
-    const now = new Date();
-    await this.db.insert(aiRecommendationsTable).values({
-      ...recommendation,
-      id,
-      isRead: false,
-      createdAt: now,
-      data: recommendation.data ?? {},
+    const result = await this.db.insert(aiRecommendationsTable).values({
+      type: recommendation.type,
+      title: recommendation.title,
+      description: recommendation.description,
       priority: recommendation.priority ?? "medium",
-    } as any);
-    const rows = await this.db.select().from(aiRecommendationsTable).where(eq(aiRecommendationsTable.id, id));
-    return rows[0] as AiRecommendation;
+      isRead: false,
+      data: recommendation.data ?? {},
+    }).returning();
+
+    return result[0] as AiRecommendation;
   }
 
   async markRecommendationAsRead(id: string): Promise<AiRecommendation | undefined> {
