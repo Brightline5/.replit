@@ -275,7 +275,7 @@ function calculateStaffUtilization(shifts: Shift[], staff: Staff[]): number {
  */
 function countOvertimeViolations(
   shifts: Shift[],
-  staff: Staff[],
+  _staff: Staff[],
   constraints: ScheduleConstraints
 ): number {
   const staffHours: { [staffId: string]: number } = {};
