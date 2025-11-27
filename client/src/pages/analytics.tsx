@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import DemandChart from '@/components/demand-chart';
-import { BarChart3, TrendingUp, Clock, DollarSign, Users, Calendar } from 'lucide-react';
+import { BarChart3, TrendingUp, Clock, DollarSign, Users } from 'lucide-react';
 
 interface AnalyticsMetrics {
   activeStaff: number;
