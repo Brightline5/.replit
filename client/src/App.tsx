@@ -15,9 +15,9 @@ import Sidebar from "@/components/sidebar";
 
 function MainLayout() {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-auto">
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-gray-50">
         <Switch>
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/scheduling" component={Scheduling} />
