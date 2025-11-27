@@ -35,7 +35,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gray-100 py-8 overflow-y-auto">
       <div className="bg-white shadow-xl rounded-lg p-8 w-full max-w-sm">
         <h1 className="text-2xl font-semibold mb-4 text-center">ShiftSage Login</h1>
 
