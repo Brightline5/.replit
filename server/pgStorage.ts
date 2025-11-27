@@ -1,7 +1,6 @@
-// server/pgStorage.ts
 import { randomUUID } from "crypto";
-import { createPool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
 import { eq, sql } from "drizzle-orm";
 import {
   staff as staffTable,
@@ -9,9 +8,8 @@ import {
   demandForecasts as demandForecastsTable,
   scheduleTemplates as scheduleTemplatesTable,
   aiRecommendations as aiRecommendationsTable,
-} from "../shared/schema"; // adjust path if your shared schema path is different
+} from "../shared/schema";
 
-// import types (adjust path if your types live elsewhere)
 import type {
   Staff,
   InsertStaff,
@@ -25,18 +23,17 @@ import type {
   InsertAiRecommendation,
 } from "../shared/schema";
 
-import type { IStorage } from "./storage"; // adjust path if IStorage interface lives elsewhere
+import type { IStorage } from "./storage";
 
 export class PgStorage implements IStorage {
-  private pool: ReturnType<typeof createPool>;
+  private pool: Pool;
   private db: ReturnType<typeof drizzle>;
 
   constructor(databaseUrl: string) {
-    this.pool = createPool(databaseUrl);
-    this.db = drizzle(this.pool as any);
+    this.pool = new Pool({ connectionString: databaseUrl });
+    this.db = drizzle(this.pool);
   }
 
-  // STAFF
   async getStaff(): Promise<Staff[]> {
     const rows = await this.db.select().from(staffTable).where(eq(staffTable.isActive, true));
     return rows as unknown as Staff[];
@@ -61,7 +58,7 @@ export class PgStorage implements IStorage {
       skills: insertStaff.skills ?? [],
       isActive: insertStaff.isActive ?? true,
       createdAt: now,
-    }).run();
+    } as any);
 
     const created = await this.getStaffById(id);
     if (!created) throw new Error("Failed to create staff");
@@ -69,21 +66,20 @@ export class PgStorage implements IStorage {
   }
 
   async updateStaff(id: string, updates: Partial<InsertStaff>): Promise<Staff | undefined> {
-    await this.db.update(staffTable).set(updates as any).where(eq(staffTable.id, id)).run();
+    await this.db.update(staffTable).set(updates as any).where(eq(staffTable.id, id));
     return this.getStaffById(id);
   }
 
   async deleteStaff(id: string): Promise<boolean> {
-    await this.db.update(staffTable).set({ isActive: false }).where(eq(staffTable.id, id)).run();
+    await this.db.update(staffTable).set({ isActive: false }).where(eq(staffTable.id, id));
     return true;
   }
 
-  // SHIFTS
   async getShifts(filters?: { date?: string; staffId?: string }): Promise<Shift[]> {
-    let q = this.db.select().from(shiftsTable);
-    if (filters?.date) q = q.where(eq(shiftsTable.date, filters.date));
-    if (filters?.staffId) q = q.where(eq(shiftsTable.staffId, filters.staffId));
-    const rows = await q;
+    let query = this.db.select().from(shiftsTable).$dynamic();
+    if (filters?.date) query = query.where(eq(shiftsTable.date, filters.date));
+    if (filters?.staffId) query = query.where(eq(shiftsTable.staffId, filters.staffId));
+    const rows = await query;
     return rows as unknown as Shift[];
   }
 
@@ -101,7 +97,7 @@ export class PgStorage implements IStorage {
       createdAt: now,
       status: insertShift.status ?? "scheduled",
       notes: insertShift.notes ?? null,
-    } as any).run();
+    } as any);
 
     const created = await this.getShiftById(id);
     if (!created) throw new Error("Failed to create shift");
@@ -109,23 +105,21 @@ export class PgStorage implements IStorage {
   }
 
   async updateShift(id: string, updates: Partial<InsertShift>): Promise<Shift | undefined> {
-    await this.db.update(shiftsTable).set(updates as any).where(eq(shiftsTable.id, id)).run();
+    await this.db.update(shiftsTable).set(updates as any).where(eq(shiftsTable.id, id));
     return this.getShiftById(id);
   }
 
   async deleteShift(id: string): Promise<boolean> {
-    await this.db.delete(shiftsTable).where(eq(shiftsTable.id, id)).run();
+    await this.db.delete(shiftsTable).where(eq(shiftsTable.id, id));
     return true;
   }
 
-  // DEMAND FORECASTS
   async getDemandForecasts(dateRange?: { start: string; end: string }): Promise<DemandForecast[]> {
-    let q = this.db.select().from(demandForecastsTable);
+    let query = this.db.select().from(demandForecastsTable).$dynamic();
     if (dateRange) {
-      // assume date is stored as 'YYYY-MM-DD' string or date-like comparable lexically
-      q = q.where(sql`${demandForecastsTable.date} >= ${dateRange.start} AND ${demandForecastsTable.date} <= ${dateRange.end}`);
+      query = query.where(sql`${demandForecastsTable.date} >= ${dateRange.start} AND ${demandForecastsTable.date} <= ${dateRange.end}`);
     }
-    const rows = await q;
+    const rows = await query;
     return (rows as unknown as DemandForecast[]).sort((a, b) => a.date.localeCompare(b.date));
   }
 
@@ -137,18 +131,17 @@ export class PgStorage implements IStorage {
       id,
       createdAt: now,
       actualDemand: forecast.actualDemand ?? null,
-    } as any).run();
+    } as any);
     const rows = await this.db.select().from(demandForecastsTable).where(eq(demandForecastsTable.id, id));
     return rows[0] as DemandForecast;
   }
 
   async updateActualDemand(id: string, actualDemand: number): Promise<DemandForecast | undefined> {
-    await this.db.update(demandForecastsTable).set({ actualDemand }).where(eq(demandForecastsTable.id, id)).run();
+    await this.db.update(demandForecastsTable).set({ actualDemand }).where(eq(demandForecastsTable.id, id));
     const rows = await this.db.select().from(demandForecastsTable).where(eq(demandForecastsTable.id, id));
     return rows[0] as DemandForecast | undefined;
   }
 
-  // SCHEDULE TEMPLATES
   async getScheduleTemplates(): Promise<ScheduleTemplate[]> {
     const rows = await this.db.select().from(scheduleTemplatesTable);
     return rows as unknown as ScheduleTemplate[];
@@ -168,19 +161,18 @@ export class PgStorage implements IStorage {
       createdAt: now,
       description: template.description ?? null,
       isDefault: template.isDefault ?? false,
-    } as any).run();
+    } as any);
     const rows = await this.db.select().from(scheduleTemplatesTable).where(eq(scheduleTemplatesTable.id, id));
     return rows[0] as ScheduleTemplate;
   }
 
-  // AI Recommendations
   async getAiRecommendations(filters?: { isRead?: boolean }): Promise<AiRecommendation[]> {
-    let q = this.db.select().from(aiRecommendationsTable);
-    if (filters?.isRead !== undefined) q = q.where(eq(aiRecommendationsTable.isRead, filters.isRead));
-    const rows = await q;
+    let query = this.db.select().from(aiRecommendationsTable).$dynamic();
+    if (filters?.isRead !== undefined) query = query.where(eq(aiRecommendationsTable.isRead, filters.isRead));
+    const rows = await query;
     return (rows as unknown as AiRecommendation[]).sort((a, b) => {
-      const aT = new Date(a.createdAt).getTime();
-      const bT = new Date(b.createdAt).getTime();
+      const aT = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bT = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return bT - aT;
     });
   }
@@ -195,13 +187,13 @@ export class PgStorage implements IStorage {
       createdAt: now,
       data: recommendation.data ?? {},
       priority: recommendation.priority ?? "medium",
-    } as any).run();
+    } as any);
     const rows = await this.db.select().from(aiRecommendationsTable).where(eq(aiRecommendationsTable.id, id));
     return rows[0] as AiRecommendation;
   }
 
   async markRecommendationAsRead(id: string): Promise<AiRecommendation | undefined> {
-    await this.db.update(aiRecommendationsTable).set({ isRead: true }).where(eq(aiRecommendationsTable.id, id)).run();
+    await this.db.update(aiRecommendationsTable).set({ isRead: true }).where(eq(aiRecommendationsTable.id, id));
     const rows = await this.db.select().from(aiRecommendationsTable).where(eq(aiRecommendationsTable.id, id));
     return (rows[0] as AiRecommendation) || undefined;
   }
