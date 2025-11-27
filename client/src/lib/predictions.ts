@@ -207,7 +207,6 @@ function getHistoricalPattern(
  */
 function getSeasonalAdjustment(date: Date): number {
   const month = date.getMonth();
-  const dayOfYear = getDayOfYear(date);
   
   // Seasonal patterns (higher in summer, lower in winter for restaurants)
   const seasonalFactors = [
