@@ -89,7 +89,7 @@ export default function Staff() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 min-h-0 overflow-y-auto">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -265,7 +265,7 @@ export default function Staff() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Avg. Hourly Rate</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    ${isLoading ? '...' : (staff?.reduce((sum, s) => sum + parseFloat(s.hourlyRate), 0) / (staff?.length || 1) || 0).toFixed(2)}
+                    ${isLoading ? '...' : ((staff?.reduce((sum, s) => sum + parseFloat(s.hourlyRate), 0) ?? 0) / (staff?.length || 1)).toFixed(2)}
                   </p>
                 </div>
               </div>
