@@ -10,15 +10,15 @@ import Analytics from "@/pages/analytics";
 import Predictions from "@/pages/predictions";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
+import LoginPage from "@/pages/Login";
 import Sidebar from "@/components/sidebar";
 
-function Router() {
+function MainLayout() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-auto">
         <Switch>
-          <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/scheduling" component={Scheduling} />
           <Route path="/staff" component={Staff} />
@@ -29,6 +29,16 @@ function Router() {
         </Switch>
       </div>
     </div>
+  );
+}
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={LoginPage} />
+      <Route path="/login" component={LoginPage} />
+      <Route component={MainLayout} />
+    </Switch>
   );
 }
 
