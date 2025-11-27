@@ -121,7 +121,7 @@ function generateDaySchedule(
   date: string,
   forecasts: { [timeSlot: string]: DemandForecast },
   staff: Staff[],
-  constraints: ScheduleConstraints
+  _constraints: ScheduleConstraints
 ) {
   const shifts: Shift[] = [];
   const violations: string[] = [];
