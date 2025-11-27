@@ -10,15 +10,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { password } = req.body;
     const managerPassword = process.env.MANAGER_PASSWORD;
 
+    console.log("Login attempt - password provided:", !!password);
+    console.log("Manager password configured:", !!managerPassword);
+
     if (!managerPassword) {
+      console.log("MANAGER_PASSWORD not set");
       return res.status(500).json({ error: "Server configuration error" });
     }
 
     if (password === managerPassword) {
       req.session.isAuthenticated = true;
+      console.log("Login successful");
       return res.json({ success: true });
     }
 
+    console.log("Login failed - invalid password");
     return res.status(401).json({ error: "Invalid password" });
   });
 
