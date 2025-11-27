@@ -8,24 +8,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/auth/login", (req, res) => {
     const { password } = req.body;
-    const managerPassword = process.env.MANAGER_PASSWORD;
 
-    console.log("Login attempt - password provided:", !!password);
-    console.log("Manager password configured:", !!managerPassword);
-
-    if (!managerPassword) {
-      console.log("MANAGER_PASSWORD not set");
-      return res.status(500).json({ error: "Server configuration error" });
-    }
-
-    if (password === managerPassword) {
-      req.session.isAuthenticated = true;
-      console.log("Login successful");
+    if (password === process.env.MANAGER_PASSWORD) {
+      req.session.user = { role: "manager" };
       return res.json({ success: true });
     }
 
-    console.log("Login failed - invalid password");
-    return res.status(401).json({ error: "Invalid password" });
+    res.status(401).json({ error: "Invalid password" });
   });
 
   app.post("/auth/logout", (req, res) => {
@@ -38,14 +27,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/auth/check", (req, res) => {
-    res.json({ isAuthenticated: !!req.session.isAuthenticated });
+    res.json({ isAuthenticated: !!req.session.user });
   });
 
   app.get("/auth/me", (req, res) => {
-    if (req.session.isAuthenticated) {
-      return res.json({ authenticated: true });
+    if (req.session.user) {
+      return res.json(req.session.user);
     }
-    return res.status(401).json({ error: "Not authenticated" });
+    res.status(401).json({ error: "Not logged in" });
   });
 
   // Staff routes
