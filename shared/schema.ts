@@ -28,7 +28,7 @@ export const staff = pgTable("staff", {
     .default({}),
   skills: json("skills").$type<string[]>().default([]),
   isActive: boolean("is_active").default(true),
-  createdAt: imestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const shifts = pgTable("shifts", {
