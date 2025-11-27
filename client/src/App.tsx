@@ -12,6 +12,7 @@ import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 import LoginPage from "@/pages/Login";
 import Sidebar from "@/components/sidebar";
+import RequireLogin from "@/components/RequireLogin";
 
 function MainLayout() {
   return (
@@ -32,12 +33,20 @@ function MainLayout() {
   );
 }
 
+function ProtectedLayout() {
+  return (
+    <RequireLogin>
+      <MainLayout />
+    </RequireLogin>
+  );
+}
+
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LoginPage} />
       <Route path="/login" component={LoginPage} />
-      <Route component={MainLayout} />
+      <Route component={ProtectedLayout} />
     </Switch>
   );
 }
