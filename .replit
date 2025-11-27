@@ -4,6 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["perlPackages.PodMarkdown", "sbclPackages.parse-float"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -38,6 +39,9 @@ waitForPort = 5000
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 33919
-externalPort = 3000
+[userenv]
+
+[userenv.development]
+DATABASE_URL = "postgresql://neondb_owner:npg_vIz0KP2bNMBc@ep-winter-surf-ae2njczu-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+MANAGER_PASSWORD = "pilot-hello-2025"
+SESSION_SECRET = "replace-this-with-along-random-string"
