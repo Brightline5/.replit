@@ -41,6 +41,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ isAuthenticated: !!req.session.isAuthenticated });
   });
 
+  app.get("/auth/me", (req, res) => {
+    if (req.session.isAuthenticated) {
+      return res.json({ authenticated: true });
+    }
+    return res.status(401).json({ error: "Not authenticated" });
+  });
+
   // Staff routes
   app.get("/api/staff", async (req, res) => {
     try {
