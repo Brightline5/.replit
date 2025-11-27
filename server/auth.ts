@@ -2,7 +2,7 @@
 import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import { createPool } from "@neondatabase/serverless";
+import { Pool } from "@neondatabase/serverless";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,7 +13,7 @@ if (!DATABASE_URL) {
   console.warn("WARNING: DATABASE_URL not set — sessions will not persist unless set.");
 }
 
-const pool = DATABASE_URL ? (createPool(DATABASE_URL) as any) : null;
+const pool = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL }) : null;
 
 // session store
 const PgSession = connectPgSimple(session as any);
