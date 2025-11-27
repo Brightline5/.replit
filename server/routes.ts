@@ -5,6 +5,36 @@ import { insertStaffSchema, insertShiftSchema, insertDemandForecastSchema, inser
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/auth/login", (req, res) => {
+    const { password } = req.body;
+    const managerPassword = process.env.MANAGER_PASSWORD;
+
+    if (!managerPassword) {
+      return res.status(500).json({ error: "Server configuration error" });
+    }
+
+    if (password === managerPassword) {
+      req.session.isAuthenticated = true;
+      return res.json({ success: true });
+    }
+
+    return res.status(401).json({ error: "Invalid password" });
+  });
+
+  app.post("/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to logout" });
+      }
+      res.json({ success: true });
+    });
+  });
+
+  app.get("/auth/check", (req, res) => {
+    res.json({ isAuthenticated: !!req.session.isAuthenticated });
+  });
+
   // Staff routes
   app.get("/api/staff", async (req, res) => {
     try {
