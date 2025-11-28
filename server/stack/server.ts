@@ -1,9 +1,8 @@
-import { StackServerApp } from "@stackframe/js";
+import { StackServerApp } from "@stackframe/react";
 
-const stackServerApp = new StackServerApp({
-  // You should store these in environment variables based on your project setup
-  projectId: "eb04e940-25a6-4888-85b6-041d6fdcf015",
-  publishableClientKey: "pck_83xp3d7kgbqssrrrb9x133ke9c6p6r2zkp6bwgtn0d4k8",
-  secretServerKey: "ssk_qjgx8dw95gz8vz9p01rxkd663x4mpy236tkd5cnkv8vy8",
+export const stackServerApp = new StackServerApp({
+  projectId: process.env.STACK_PROJECT_ID!,
+  publishableClientKey: process.env.STACK_PUBLISHABLE_CLIENT_KEY!,
+  secretServerKey: process.env.STACK_SECRET_SERVER_KEY!,
   tokenStore: "memory",
 });
