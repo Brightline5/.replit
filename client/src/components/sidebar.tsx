@@ -1,5 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import { useUser } from "@stackframe/react";
+import { stackClientApp } from "@/lib/stack";
 import { 
   ChartLine, 
   Calendar, 
@@ -7,7 +9,8 @@ import {
   BarChart3, 
   Brain, 
   Settings,
-  Utensils
+  Utensils,
+  LogOut
 } from "lucide-react";
 
 const navigation = [
@@ -21,6 +24,12 @@ const navigation = [
 
 export default function Sidebar() {
   const [location] = useLocation();
+  const user = useUser();
+
+  const handleLogout = async () => {
+    await stackClientApp.signOut();
+    window.location.href = "/login";
+  };
 
   return (
     <div className="hidden lg:flex lg:w-64 lg:flex-col">
@@ -55,16 +64,26 @@ export default function Sidebar() {
 
         {/* User Profile */}
         <div className="flex-shrink-0 p-4">
-          <div className="flex items-center">
-            <img
-              className="inline-block h-10 w-10 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=150&h=150"
-              alt="Manager profile"
-            />
-            <div className="ml-3">
-              <p className="text-sm font-medium text-white">Alex Thompson</p>
-              <p className="text-xs text-gray-300">Restaurant Manager</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="inline-flex h-10 w-10 rounded-full bg-green-500 items-center justify-center">
+                <span className="text-white font-medium text-sm">
+                  {user?.displayName?.charAt(0)?.toUpperCase() || user?.primaryEmail?.charAt(0)?.toUpperCase() || "U"}
+                </span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-white">{user?.displayName || user?.primaryEmail || "User"}</p>
+                <p className="text-xs text-gray-300">Restaurant Manager</p>
+              </div>
             </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg hover:bg-gray-700 transition-colors"
+              title="Sign out"
+              data-testid="button-logout"
+            >
+              <LogOut className="h-5 w-5 text-gray-300 hover:text-white" />
+            </button>
           </div>
         </div>
       </div>
