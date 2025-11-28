@@ -1,8 +1,10 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { StackProvider, StackHandler, StackTheme } from "@stackframe/react";
+import { stackClientApp } from "./lib/stack";
 import Dashboard from "@/pages/dashboard";
 import Scheduling from "@/pages/scheduling";
 import Staff from "@/pages/staff";
@@ -13,6 +15,12 @@ import NotFound from "@/pages/not-found";
 import LoginPage from "@/pages/Login";
 import Sidebar from "@/components/sidebar";
 import RequireLogin from "@/components/RequireLogin";
+import { Suspense } from "react";
+
+function StackHandlerPage() {
+  const [location] = useLocation();
+  return <StackHandler app={stackClientApp} location={location} fullPage />;
+}
 
 function MainLayout() {
   return (
@@ -46,6 +54,7 @@ function Router() {
     <Switch>
       <Route path="/" component={LoginPage} />
       <Route path="/login" component={LoginPage} />
+      <Route path="/handler/:rest*" component={StackHandlerPage} />
       <Route component={ProtectedLayout} />
     </Switch>
   );
@@ -53,12 +62,18 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <StackProvider app={stackClientApp}>
+        <StackTheme>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </StackTheme>
+      </StackProvider>
+    </Suspense>
   );
 }
 

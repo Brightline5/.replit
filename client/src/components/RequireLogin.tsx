@@ -1,27 +1,24 @@
-import { useEffect, useState } from "react";
+import { useUser } from "@stackframe/react";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 
 export default function RequireLogin({ children }: { children: React.ReactNode }) {
   const [, navigate] = useLocation();
-  const [checked, setChecked] = useState(false);
+  const user = useUser();
 
   useEffect(() => {
-    async function check() {
-      const res = await fetch("/auth/me", {
-        credentials: "include",
-      });
-
-      if (res.status === 200) {
-        setChecked(true);
-      } else {
-        navigate("/login");
-      }
+    if (user === null) {
+      navigate("/login");
     }
+  }, [user, navigate]);
 
-    check();
-  }, []);
-
-  if (!checked) return null;
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }
