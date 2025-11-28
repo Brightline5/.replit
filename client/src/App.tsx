@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { StackProvider, StackHandler, StackTheme } from "@stackframe/react";
+import { StackHandler, StackProvider, StackTheme } from "@stackframe/react";
 import { stackClientApp } from "./lib/stack";
 import Dashboard from "@/pages/dashboard";
 import Scheduling from "@/pages/scheduling";
@@ -17,7 +17,7 @@ import Sidebar from "@/components/sidebar";
 import RequireLogin from "@/components/RequireLogin";
 import { Suspense } from "react";
 
-function StackHandlerPage() {
+function HandlerRoutes() {
   const [location] = useLocation();
   return <StackHandler app={stackClientApp} location={location} fullPage />;
 }
@@ -49,26 +49,20 @@ function ProtectedLayout() {
   );
 }
 
-function Router() {
+export default function App() {
   return (
-    <Switch>
-      <Route path="/" component={LoginPage} />
-      <Route path="/login" component={LoginPage} />
-      <Route path="/handler/:rest*" component={StackHandlerPage} />
-      <Route component={ProtectedLayout} />
-    </Switch>
-  );
-}
-
-function App() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+    <Suspense fallback={"Loading..."}>
       <StackProvider app={stackClientApp}>
         <StackTheme>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <Toaster />
-              <Router />
+              <Switch>
+                <Route path="/handler/:rest*" component={HandlerRoutes} />
+                <Route path="/" component={LoginPage} />
+                <Route path="/login" component={LoginPage} />
+                <Route component={ProtectedLayout} />
+              </Switch>
             </TooltipProvider>
           </QueryClientProvider>
         </StackTheme>
@@ -76,5 +70,3 @@ function App() {
     </Suspense>
   );
 }
-
-export default App;
