@@ -12,6 +12,9 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const PGCRYPTO_EXTENSION_SQL = 
+  'CREATE EXTENSION IF NOT EXISTS "pgcrypto";';
+
 export const staff = pgTable("staff", {
   id: varchar("id")
     .primaryKey()
