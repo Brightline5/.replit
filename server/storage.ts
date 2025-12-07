@@ -15,7 +15,7 @@ import { randomUUID } from "crypto";
 export interface IStorage {
   // Staff methods
   getStaff(): Promise<Staff[]>;
-  getStaffById(id: string): Promise<Staff| undefined>;
+  getStaffById(id: string): Promise<Staff | undefined>;
   createStaff(staff: InsertStaff): Promise<Staff>;
   updateStaff(id: string, updates: Partial<InsertStaff>): Promise<Staff | undefined>;
   deleteStaff(id: string): Promise<boolean>;

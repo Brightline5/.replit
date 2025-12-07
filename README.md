@@ -1,11 +1,77 @@
-RestaurantAI - Intelligent Staff Scheduling System
-Overview
-RestaurantAI is a modern web application designed to optimize restaurant staff scheduling using AI-powered demand forecasting and intelligent recommendations. The system helps restaurant managers make data-driven decisions about staffing, reduce labor costs, and improve operational efficiency through predictive analytics.
+# ShiftSage - Intelligent Restaurant Scheduling System
 
-User Preferences
+## Overview
+ShiftSage is a modern web application designed to optimize restaurant staff scheduling using AI-powered demand forecasting and intelligent recommendations. The system helps restaurant managers make data-driven decisions about staffing, reduce labor costs, and improve operational efficiency through predictive analytics.
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+ installed
+- npm or pnpm package manager
+- (Optional) PostgreSQL database for persistent storage
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Brightline5/.replit.git
+cd .replit
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables (optional):
+```bash
+cp env.example .env
+# Edit .env with your configuration
+```
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5000`
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## Project Structure
+
+```
+.
+├── client/               # Frontend React application
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── pages/        # Page components
+│   │   ├── lib/          # Utilities and helpers
+│   │   └── hooks/        # Custom React hooks
+│   └── index.html        # HTML entry point
+├── server/               # Backend Express application
+│   ├── index.ts          # Server entry point
+│   ├── routes.ts         # API routes
+│   ├── storage.ts        # In-memory storage
+│   ├── pgStorage.ts      # PostgreSQL storage
+│   ├── vite.ts           # Vite middleware
+│   └── auth.ts           # Authentication logic
+├── shared/               # Shared code between client and server
+│   └── schema.ts         # Data schemas and types
+└── scripts/              # Utility scripts
+    └── seedNeon.ts       # Database seeding script
+
+```
+
+## User Preferences
 Preferred communication style: Simple, everyday language.
 
-System Architecture
+## System Architecture
 Frontend Architecture
 Framework: React 18 with TypeScript
 Routing: Wouter for client-side routing
@@ -19,6 +85,29 @@ Language: TypeScript with ES modules
 Data Layer: Drizzle ORM with PostgreSQL (Neon Database)
 Storage Pattern: Repository pattern with in-memory fallback storage
 API Design: RESTful endpoints with JSON responses
+
+## Security
+
+### Current Security Measures
+- **Input Validation**: All API endpoints use Zod schemas for request validation
+- **Error Handling**: Comprehensive error logging and user-friendly error messages
+- **Session Security**: HTTP-only cookies with secure flag in production
+- **SQL Injection Protection**: Drizzle ORM provides parameterized queries
+- **Type Safety**: Full TypeScript coverage prevents runtime type errors
+
+### Security Considerations
+- **Authentication**: Basic password authentication (suitable for MVP/demo)
+- **CSRF Protection**: Consider adding CSRF tokens for production deployments
+- **Rate Limiting**: File serving routes are controlled by Vite/Express (dev only)
+- **HTTPS**: Always use HTTPS in production (secure cookies enabled automatically)
+
+### For Production Deployment
+1. Set strong `SESSION_SECRET` and `MANAGER_PASSWORD` environment variables
+2. Enable HTTPS on your hosting platform
+3. Consider implementing OAuth2 or JWT authentication
+4. Add rate limiting middleware for API endpoints
+5. Implement CSRF token validation for state-changing operations
+
 Key Components
 Data Models
 Staff: Employee information including availability, skills, and hourly rates
