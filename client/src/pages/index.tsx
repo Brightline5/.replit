@@ -1,8 +1,3 @@
-// client/src/pages/staff/index.tsx
-// Minimal Staff page (list + create) using your UI components.
-// Adjust path aliases if your setup differs.
-
-import React from "react";
 import { useForm } from "react-hook-form";
 import apiFetch from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,8 +34,14 @@ async function createStaff(body: Partial<Staff>) {
 
 export default function StaffPage() {
   const qc = useQueryClient();
-  const { data: staff, isLoading } = useQuery<Staff[], Error>(["staff"], fetchStaff);
-  const create = useMutation(createStaff, { onSuccess: () => qc.invalidateQueries(["staff"]) });
+  const { data: staff, isLoading } = useQuery<Staff[], Error>({
+    queryKey: ["staff"],
+    queryFn: fetchStaff,
+  });
+  const create = useMutation({
+    mutationFn: createStaff,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["staff"] }),
+  });
   const form = useForm<{ name: string }>();
 
   async function onSubmit(values: { name: string }) {
@@ -64,7 +65,7 @@ export default function StaffPage() {
             <FormMessage />
           </FormItem>
 
-          <Button type="submit" disabled={create.isLoading}>
+          <Button type="submit" disabled={create.isPending}>
             Add
           </Button>
         </form>

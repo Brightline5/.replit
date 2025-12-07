@@ -1,8 +1,7 @@
-// server/auth.ts
 import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import { Pool } from "@neondatabase/serverless";
+import pg from "pg";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,11 +12,10 @@ if (!DATABASE_URL) {
   console.warn("WARNING: DATABASE_URL not set — sessions will not persist unless set.");
 }
 
-const pool = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL }) : null;
+const pool = DATABASE_URL ? new pg.Pool({ connectionString: DATABASE_URL }) : null;
 
-// session store
-const PgSession = connectPgSimple(session as any);
-const sessionStore = pool ? new PgSession({ pool }) : undefined;
+const PgSession = connectPgSimple(session);
+const sessionStore = pool ? new PgSession({ pool: pool as any }) : undefined;
 
 export const sessionMiddleware = session({
   store: sessionStore,
@@ -27,12 +25,11 @@ export const sessionMiddleware = session({
   cookie: {
     httpOnly: true,
     sameSite: "lax",
-    secure: false, // Replit dev uses http; set true if using https & production
-    maxAge: 1000 * 60 * 60 * 8, // 8 hours
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 8,
   },
 });
 
-// auth router
 export const authRouter = express.Router();
 
 authRouter.post("/login", express.json(), (req, res) => {
@@ -40,7 +37,6 @@ authRouter.post("/login", express.json(), (req, res) => {
   if (!password) return res.status(400).json({ error: "Missing password" });
   if (password !== MANAGER_PASSWORD) return res.status(401).json({ error: "Invalid password" });
 
-  // set session
   (req as any).session.user = { role: "manager" };
   return res.json({ ok: true });
 });

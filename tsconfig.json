@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Node16", // <-- Change this to 'Node16' (or NodeNext/Bundler if needed)
+    "moduleResolution": "bundler",
     "lib": ["DOM", "ESNext"],
     "useDefineForClassFields": true,
     "strict": true,
@@ -12,16 +12,15 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["client/src/*"],
       "@shared/*": ["shared/*"]
     }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts"
+    "client/src/**/*.ts",
+    "client/src/**/*.tsx",
+    "server/**/*.ts",
+    "shared/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
