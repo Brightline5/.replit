@@ -4,17 +4,33 @@ import { storage } from "./storage";
 import { insertStaffSchema, insertShiftSchema, insertDemandForecastSchema, insertAiRecommendationSchema } from "@shared/schema";
 import { z } from "zod";
 
+// Middleware to check authentication
+const requireAuth = (req: any, res: any, next: any) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  next();
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/auth/login", (req, res) => {
-    const { password } = req.body;
+    try {
+      const { password } = req.body;
 
-    if (password === process.env.MANAGER_PASSWORD) {
-      req.session.user = { role: "manager" };
-      return res.json({ success: true });
+      if (!password || typeof password !== 'string') {
+        return res.status(400).json({ error: "Password is required" });
+      }
+
+      if (password === process.env.MANAGER_PASSWORD) {
+        req.session.user = { role: "manager" };
+        return res.json({ success: true });
+      }
+
+      res.status(401).json({ error: "Invalid password" });
+    } catch (error) {
+      res.status(500).json({ error: "Login failed" });
     }
-
-    res.status(401).json({ error: "Invalid password" });
   });
 
   app.post("/auth/logout", (req, res) => {
@@ -37,24 +53,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(401).json({ error: "Not logged in" });
   });
 
-  // Staff routes
+  // Staff routes - Add authentication middleware to protect these routes
   app.get("/api/staff", async (req, res) => {
     try {
       const staff = await storage.getStaff();
       res.json(staff);
     } catch (error) {
+      console.error('Error fetching staff:', error);
       res.status(500).json({ message: "Failed to fetch staff" });
     }
   });
 
   app.get("/api/staff/:id", async (req, res) => {
     try {
-      const staff = await storage.getStaffById(req.params.id);
+      // Validate UUID format
+      const id = req.params.id;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ message: "Invalid staff ID" });
+      }
+
+      const staff = await storage.getStaffById(id);
       if (!staff) {
         return res.status(404).json({ message: "Staff member not found" });
       }
       res.json(staff);
     } catch (error) {
+      console.error('Error fetching staff member:', error);
       res.status(500).json({ message: "Failed to fetch staff member" });
     }
   });
@@ -68,14 +92,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
+      console.error('Error creating staff member:', error);
       res.status(500).json({ message: "Failed to create staff member" });
     }
   });
 
   app.put("/api/staff/:id", async (req, res) => {
     try {
+      const id = req.params.id;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ message: "Invalid staff ID" });
+      }
+
       const updates = insertStaffSchema.partial().parse(req.body);
-      const staff = await storage.updateStaff(req.params.id, updates);
+      const staff = await storage.updateStaff(id, updates);
       if (!staff) {
         return res.status(404).json({ message: "Staff member not found" });
       }
@@ -84,18 +114,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
+      console.error('Error updating staff member:', error);
       res.status(500).json({ message: "Failed to update staff member" });
     }
   });
 
   app.delete("/api/staff/:id", async (req, res) => {
     try {
-      const success = await storage.deleteStaff(req.params.id);
+      const id = req.params.id;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ message: "Invalid staff ID" });
+      }
+
+      const success = await storage.deleteStaff(id);
       if (!success) {
         return res.status(404).json({ message: "Staff member not found" });
       }
       res.json({ message: "Staff member deleted successfully" });
     } catch (error) {
+      console.error('Error deleting staff member:', error);
       res.status(500).json({ message: "Failed to delete staff member" });
     }
   });
