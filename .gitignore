@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# Replit specific
+.replit
+.config/
+
+# Archives and backups
+*.zip
+*.mhtml
+*.bak
+
+# Test coverage
+coverage/
+.nyc_output/
