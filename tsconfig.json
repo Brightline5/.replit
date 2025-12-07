@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node16", // <-- Change this to 'Node16' (or NodeNext/Bundler if needed)
     "lib": ["DOM", "ESNext"],
     "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
     "strict": true,
     "jsx": "preserve",
     "esModuleInterop": true,
@@ -12,8 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-      "@shared/*": ["shared/*"] // Add this line for shared types"
+      "@/*": ["src/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": [
@@ -21,7 +21,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts" // Include tests
+    "tests/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
