@@ -27,7 +27,7 @@ export const sessionMiddleware = session({
   cookie: {
     httpOnly: true,
     sameSite: "lax",
-    secure: false, // Replit dev uses http; set true if using https & production
+    secure: process.env.NODE_ENV === "production", // Enforce SSL in production
     maxAge: 1000 * 60 * 60 * 8, // 8 hours
   },
 });

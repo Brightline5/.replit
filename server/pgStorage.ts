@@ -50,7 +50,7 @@ export class PgStorage implements IStorage {
       name: insertStaff.name,
       position: insertStaff.position,
       hourlyRate: insertStaff.hourlyRate,
-      email: insertStaff.email ?? "",
+      email: insertStaff.email, // Required field per schema
       phone: insertStaff.phone ?? null,
       availability: insertStaff.availability ?? {},
       skills: insertStaff.skills ?? [],

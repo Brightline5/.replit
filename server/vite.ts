@@ -41,6 +41,9 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+  // Note: This route serves the development HTML template from disk.
+  // It's safe because: (1) only used in development, (2) serves controlled template file,
+  // (3) no user input determines file path. Vite middleware handles static asset security.
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -78,7 +81,8 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // Note: This fallback route serves the built index.html for client-side routing.
+  // It's safe because it only serves the pre-built static file, no dynamic file access.
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });

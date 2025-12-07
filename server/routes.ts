@@ -1,11 +1,11 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertStaffSchema, insertShiftSchema, insertDemandForecastSchema, insertAiRecommendationSchema } from "@shared/schema";
 import { z } from "zod";
 
 // Middleware to check authentication
-const requireAuth = (req: any, res: any, next: any) => {
+const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   if (!req.session.user) {
     return res.status(401).json({ message: "Authentication required" });
   }

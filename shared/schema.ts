@@ -12,6 +12,8 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Note: gen_random_uuid() is a PostgreSQL function. When using PostgreSQL (Neon),
+// UUIDs are generated server-side. The in-memory storage uses Node's crypto.randomUUID() instead.
 export const staff = pgTable("staff", {
   id: varchar("id")
     .primaryKey()

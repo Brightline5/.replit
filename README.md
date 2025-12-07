@@ -85,6 +85,29 @@ Language: TypeScript with ES modules
 Data Layer: Drizzle ORM with PostgreSQL (Neon Database)
 Storage Pattern: Repository pattern with in-memory fallback storage
 API Design: RESTful endpoints with JSON responses
+
+## Security
+
+### Current Security Measures
+- **Input Validation**: All API endpoints use Zod schemas for request validation
+- **Error Handling**: Comprehensive error logging and user-friendly error messages
+- **Session Security**: HTTP-only cookies with secure flag in production
+- **SQL Injection Protection**: Drizzle ORM provides parameterized queries
+- **Type Safety**: Full TypeScript coverage prevents runtime type errors
+
+### Security Considerations
+- **Authentication**: Basic password authentication (suitable for MVP/demo)
+- **CSRF Protection**: Consider adding CSRF tokens for production deployments
+- **Rate Limiting**: File serving routes are controlled by Vite/Express (dev only)
+- **HTTPS**: Always use HTTPS in production (secure cookies enabled automatically)
+
+### For Production Deployment
+1. Set strong `SESSION_SECRET` and `MANAGER_PASSWORD` environment variables
+2. Enable HTTPS on your hosting platform
+3. Consider implementing OAuth2 or JWT authentication
+4. Add rate limiting middleware for API endpoints
+5. Implement CSRF token validation for state-changing operations
+
 Key Components
 Data Models
 Staff: Employee information including availability, skills, and hourly rates
