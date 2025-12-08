@@ -1,4 +1,4 @@
-import { Staff, Shift, DemandForecast } from '@shared/schema';
+import { Staff, Shift, DemandForecast } from '../../shared/schema';
 
 export interface ScheduleConstraints {
   minStaffPerShift: number;

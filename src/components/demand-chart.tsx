@@ -1,6 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { DemandForecast } from '@shared/schema';
+import { DemandForecast } from '../../shared/schema';
 
 interface DemandChartProps {
   height?: number;

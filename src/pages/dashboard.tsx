@@ -18,7 +18,7 @@ import {
   Sparkles,
   Bell
 } from 'lucide-react';
-import { AiRecommendation } from '@shared/schema';
+import { AiRecommendation } from '../../shared/schema';
 
 interface AnalyticsMetrics {
   activeStaff: number;

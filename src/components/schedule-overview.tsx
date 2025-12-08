@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Staff, Shift } from '@shared/schema';
+import { Staff, Shift } from '../../shared/schema';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Clock, Check, User } from 'lucide-react';
