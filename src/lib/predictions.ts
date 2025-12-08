@@ -1,4 +1,4 @@
-import { DemandForecast } from '@shared/schema';
+import { DemandForecast } from '../../shared/schema';
 
 export interface PredictionData {
   day: string;

@@ -6,7 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import DemandChart from '../components/demand-chart';
 import { Brain, TrendingUp, AlertTriangle, Calendar, Users, Clock, Target } from 'lucide-react';
-import { DemandForecast } from '@shared/schema';
+import { DemandForecast } from '../../shared/schema';
 import { generatePredictions, calculateAccuracy, getRecommendations } from '../lib/predictions';
 
 export default function Predictions() {
