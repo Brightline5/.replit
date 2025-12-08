@@ -1,0 +1,99 @@
+# ===========================================
+# Replit Deployment - Reduce Image Size
+# ===========================================
+
+# Dependencies (reinstalled during deployment build)
+node_modules/
+
+# Development caches and local storage (555MB+)
+.local/
+.cache/
+.vite/
+.upm/
+
+# Version control
+.git/
+.gitignore
+
+# Replit-specific development files
+.replit
+replit.nix
+.config/
+
+# Lock files we don't use (using npm/package-lock.json)
+pnpm-lock.yaml
+yarn.lock
+
+# Build artifacts (rebuilt during deployment)
+dist/
+
+# Environment files (secrets are in deployment config)
+.env
+.env.local
+.env.development
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+coverage/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Large media files
+*.mp4
+*.mov
+*.avi
+*.wmv
+*.flv
+*.webm
+*.mp3
+*.wav
+*.ogg
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# Backup files
+*.bak
+*.backup
+
+# Development documentation (keep README)
+DEPLOYMENT.md
+.env.production.example
+
+# Drizzle migration files (schema pushed via db:push)
+drizzle/
+
+# Build script (not needed - using npm run build)
+build.sh
+
+# Attached assets (development only)
+attached_assets/
+
+# Scripts directory
+scripts/
+ts scripts/
