@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Input } from '../components/ui/input';
 import { Staff as StaffType, InsertStaff } from '@shared/schema';
 import { Users, Plus, Search, Mail, Phone, Clock, Star } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { insertStaffSchema } from '@shared/schema';
-import { queryClient } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { queryClient } from '../lib/queryClient';
+import { useToast } from '../hooks/use-toast';
+import { apiRequest } from '../lib/queryClient';
 
 export default function Staff() {
   const [searchTerm, setSearchTerm] = useState('');

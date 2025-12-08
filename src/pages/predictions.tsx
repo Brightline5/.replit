@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import DemandChart from '@/components/demand-chart';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import DemandChart from '../components/demand-chart';
 import { Brain, TrendingUp, AlertTriangle, Calendar, Users, Clock, Target } from 'lucide-react';
 import { DemandForecast } from '@shared/schema';
-import { generatePredictions, calculateAccuracy, getRecommendations } from '@/lib/predictions';
+import { generatePredictions, calculateAccuracy, getRecommendations } from '../lib/predictions';
 
 export default function Predictions() {
   const [timeframe, setTimeframe] = useState('7days');

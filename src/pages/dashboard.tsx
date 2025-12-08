@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import DemandChart from '@/components/demand-chart';
-import ScheduleOverview from '@/components/schedule-overview';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import DemandChart from '../components/demand-chart';
+import ScheduleOverview from '../components/schedule-overview';
 import { 
   Users, 
   Percent, 
