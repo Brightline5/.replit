@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import apiFetch from "@/lib/api";
+import apiFetch from "../lib/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Table,
@@ -8,16 +8,16 @@ import {
   TableHead,
   TableRow,
   TableCaption,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "../components/ui/table";
+import { Button } from "../components/ui/button";
 import {
   Form,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "../components/ui/form";
+import { Input } from "../components/ui/input";
 
 type Staff = { id: string; name: string; role?: string };
 

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { useUser } from "@stackframe/react";
-import { stackClientApp } from "@/lib/stack";
+import { stackClientApp } from "../lib/stack";
 import { 
   ChartLine, 
   Calendar, 
