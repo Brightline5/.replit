@@ -15,14 +15,6 @@ packages = ["lsof"]
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 35541
-externalPort = 3001
-
-[[ports]]
-localPort = 39553
-externalPort = 3000
-
 [userenv]
 
 [userenv.shared]
