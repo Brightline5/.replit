@@ -25,7 +25,16 @@ externalPort = 3000
 [userenv]
 
 [userenv.shared]
+
+[userenv.production]
 VITE_STACK_PROJECT_ID = "eb04e940-25a6-4888-85b6-041d6fdcf015"
+NODE_ENV = "production"
+PORT = "5000"
 VITE_STACK_PUBLISHABLE_CLIENT_KEY = "pck_w1cnvcv21maxm8vg4f2am232ec5w89xvzy2wv3jpwdxmg"
+DATABASE_URL = "postgresql://neondb_owner:npg_nw75bpRlXYaL@ep-lucky-sound-aeqcl0ig-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+STACK_PUBLISHABLE_CLIENT_KEY = "pck_w1cnvcv21maxm8vg4f2am232ec5w89xvzy2wv3jpwdxmg"
+STACK_PROJECT_ID = "eb04e940-25a6-4888-85b6-041d6fdcf015"
+STACK_SECRET_SERVER_KEY = "ssk_4bd969p158b3bt944xwrna6t4z1semds3pnpj9ckzkzdr"
+SESSION_SECRET = "openssl rand -base64 32"
 
 
