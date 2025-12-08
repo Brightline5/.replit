@@ -12,13 +12,13 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["client/src/*"],
+      "@/*": ["src/*"],
       "@shared/*": ["shared/*"]
     }
   },
   "include": [
-    "client/src/**/*.ts",
-    "client/src/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "server/**/*.ts",
     "shared/**/*.ts"
   ],
