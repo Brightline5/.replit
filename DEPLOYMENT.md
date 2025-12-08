@@ -4,6 +4,18 @@ This guide explains how to deploy your application to production.
 
 ## Build Process
 
+### Prerequisites
+
+**IMPORTANT**: The build process requires `esbuild` to compile the server code. This is already included in `devDependencies` in `package.json`.
+
+**For CI/CD or production builds**: Ensure devDependencies are installed. Most platforms install them by default, but if your build fails with "esbuild: command not found", ensure your deployment platform is configured to install devDependencies:
+
+```bash
+npm install
+```
+
+(NOT `npm install --production` which skips devDependencies)
+
 ### Option 1: Use the Custom Build Script (Recommended)
 
 Run the custom build script that properly organizes the build output:
@@ -15,7 +27,7 @@ chmod +x build.sh
 
 This script:
 - Builds the client and outputs to `dist/public/`
-- Builds the server and outputs to `dist/index.js`
+- Builds the server and outputs to `dist/index.js` using esbuild
 - Both are required for the production server to work correctly
 
 ### Option 2: Update package.json
@@ -100,6 +112,7 @@ npm run build
 
 Before deploying, ensure:
 
+- [ ] DevDependencies are installed (including `esbuild` for server compilation)
 - [ ] All required environment variables are set as Deployment Secrets
 - [ ] Build command is configured to run `./build.sh` or `npm run build`
 - [ ] Run command is set to `node dist/index.js`
@@ -111,15 +124,26 @@ Before deploying, ensure:
 
 ## Troubleshooting
 
+### "esbuild: command not found" or Build Fails
+
+**Cause**: The `esbuild` package (required for compiling the server) is not installed.
+
+**Solutions**:
+1. Ensure you're running `npm install` (NOT `npm install --production`)
+2. Verify `esbuild` is listed in `devDependencies` in `package.json`
+3. If your deployment platform has a separate setting for installing devDependencies, enable it
+4. Try running `npm install esbuild` manually if needed
+
 ### "Application failed to open a port in time"
 
 **Cause**: The server isn't starting properly or listening on the wrong port.
 
 **Solutions**:
-1. Ensure `PORT` environment variable is set to `5000`
-2. Verify `NODE_ENV` is set to `production`
-3. Check that the build completed successfully
-4. Verify `dist/public/` directory exists and contains the built client files
+1. First, ensure the build completed successfully (check for `dist/index.js` and `dist/public/`)
+2. Ensure `PORT` environment variable is set to `5000`
+3. Verify `NODE_ENV` is set to `production`
+4. Check that `dist/public/` directory exists and contains the built client files
+5. Review build logs for any esbuild errors
 
 ### "Environment variables are not being loaded"
 
