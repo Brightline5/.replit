@@ -5,6 +5,7 @@ modules = ["nodejs-20", "postgresql-16"]
 run = ["sh", "-c", "npm run build && npm start"]
 deploymentTarget = "gce"
 ignorePorts = false
+build = ["sh", "-c", "npm run build"]
 
 [nix]
 channel = "stable-25_05"
