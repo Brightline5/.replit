@@ -15,6 +15,7 @@ import NotFound from "./pages/not-found";
 import LoginPage from "./pages/Login";
 import Sidebar from "./components/sidebar";
 import RequireLogin from "./components/RequireLogin";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Suspense } from "react";
 
 function HandlerRoutes() {
@@ -51,22 +52,24 @@ function ProtectedLayout() {
 
 export default function App() {
   return (
-    <Suspense fallback={"Loading..."}>
-      <StackProvider app={stackClientApp}>
-        <StackTheme>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster />
-              <Switch>
-                <Route path="/handler/:rest*" component={HandlerRoutes} />
-                <Route path="/" component={LoginPage} />
-                <Route path="/login" component={LoginPage} />
-                <Route component={ProtectedLayout} />
-              </Switch>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </StackTheme>
-      </StackProvider>
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <StackProvider app={stackClientApp}>
+          <StackTheme>
+            <QueryClientProvider client={queryClient}>
+              <TooltipProvider>
+                <Toaster />
+                <Switch>
+                  <Route path="/handler/:rest*" component={HandlerRoutes} />
+                  <Route path="/" component={LoginPage} />
+                  <Route path="/login" component={LoginPage} />
+                  <Route component={ProtectedLayout} />
+                </Switch>
+              </TooltipProvider>
+            </QueryClientProvider>
+          </StackTheme>
+        </StackProvider>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
