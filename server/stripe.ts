@@ -29,7 +29,22 @@ stripeRouter.post("/create-checkout-session", async (req, res) => {
     const existingSub = await subscriptionStorage.getByUserId(userId);
     
     if (existingSub?.stripeCustomerId) {
-      customer = await stripe.customers.retrieve(existingSub.stripeCustomerId);
+      try {
+        const retrieved = await stripe.customers.retrieve(existingSub.stripeCustomerId);
+        if (retrieved.deleted) {
+          customer = await stripe.customers.create({
+            email: userEmail,
+            metadata: { stackUserId: userId },
+          });
+        } else {
+          customer = retrieved;
+        }
+      } catch {
+        customer = await stripe.customers.create({
+          email: userEmail,
+          metadata: { stackUserId: userId },
+        });
+      }
     } else {
       customer = await stripe.customers.create({
         email: userEmail,
@@ -91,6 +106,11 @@ stripeRouter.post("/create-portal-session", async (req, res) => {
 stripeRouter.get("/subscription/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+    
+    if (!userId || userId === "undefined" || userId === "null") {
+      return res.json({ plan: "free", status: "inactive" });
+    }
+    
     const subscription = await subscriptionStorage.getByUserId(userId);
     
     if (!subscription) {

@@ -8,6 +8,7 @@ import {
   demandForecasts as demandForecastsTable,
   scheduleTemplates as scheduleTemplatesTable,
   aiRecommendations as aiRecommendationsTable,
+  subscriptions as subscriptionsTable,
 } from "../shared/schema";
 
 import type {
@@ -21,6 +22,8 @@ import type {
   InsertScheduleTemplate,
   AiRecommendation,
   InsertAiRecommendation,
+  Subscription,
+  InsertSubscription,
 } from "../shared/schema";
 
 import type { IStorage } from "./storage";
@@ -188,6 +191,49 @@ export class PgStorage implements IStorage {
     await this.db.update(aiRecommendationsTable).set({ isRead: true }).where(eq(aiRecommendationsTable.id, id));
     const rows = await this.db.select().from(aiRecommendationsTable).where(eq(aiRecommendationsTable.id, id));
     return (rows[0] as AiRecommendation) || undefined;
+  }
+
+  // SUBSCRIPTIONS
+  async getSubscriptionByUserId(userId: string): Promise<Subscription | undefined> {
+    const rows = await this.db.select().from(subscriptionsTable).where(eq(subscriptionsTable.userId, userId));
+    return (rows[0] as unknown as Subscription) || undefined;
+  }
+
+  async getSubscriptionByStripeCustomerId(stripeCustomerId: string): Promise<Subscription | undefined> {
+    const rows = await this.db.select().from(subscriptionsTable).where(eq(subscriptionsTable.stripeCustomerId, stripeCustomerId));
+    return (rows[0] as unknown as Subscription) || undefined;
+  }
+
+  async createSubscription(data: InsertSubscription): Promise<Subscription> {
+    const result = await this.db.insert(subscriptionsTable).values({
+      userId: data.userId,
+      stripeCustomerId: data.stripeCustomerId ?? null,
+      stripeSubscriptionId: data.stripeSubscriptionId ?? null,
+      stripePriceId: data.stripePriceId ?? null,
+      status: data.status ?? "inactive",
+      plan: data.plan ?? "free",
+      currentPeriodStart: data.currentPeriodStart ?? null,
+      currentPeriodEnd: data.currentPeriodEnd ?? null,
+    }).returning();
+
+    return result[0] as Subscription;
+  }
+
+  async updateSubscription(id: string, updates: Partial<InsertSubscription>): Promise<Subscription | undefined> {
+    await this.db.update(subscriptionsTable).set({
+      ...updates,
+      updatedAt: new Date(),
+    } as any).where(eq(subscriptionsTable.id, id));
+    const rows = await this.db.select().from(subscriptionsTable).where(eq(subscriptionsTable.id, id));
+    return (rows[0] as unknown as Subscription) || undefined;
+  }
+
+  async upsertSubscription(data: InsertSubscription): Promise<Subscription> {
+    const existing = await this.getSubscriptionByUserId(data.userId);
+    if (existing) {
+      return (await this.updateSubscription(existing.id, data)) as Subscription;
+    }
+    return this.createSubscription(data);
   }
 }
 

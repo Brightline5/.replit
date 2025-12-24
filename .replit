@@ -22,7 +22,7 @@ externalPort = 3000
 [userenv]
 
 [userenv.shared]
-VITE_STRIPE_PUBLISHABLE_KEY = ""
+VITE_STRIPE_PUBLISHABLE_KEY = "pk_live_51SgXxERpPaWuXbNHdKdotdcPvpM6cE01BSJHyz8ZJjB1UzHlUkoyx4UwDGE77DcYGCi7S8prlOBCAzfTD1gPDjkN00Sy0B2tQs"
 
 [userenv.production]
 VITE_STACK_PROJECT_ID = "eb04e940-25a6-4888-85b6-041d6fdcf015"

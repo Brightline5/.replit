@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { useUser } from "@stackframe/react";
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 import DemandChart from '../components/demand-chart';
 import ScheduleOverview from '../components/schedule-overview';
 import { 
@@ -16,9 +18,12 @@ import {
   UserPlus,
   BarChart3,
   Sparkles,
-  Bell
+  Bell,
+  Crown
 } from 'lucide-react';
 import { AiRecommendation } from '../../shared/schema';
+import { getSubscription } from '../lib/stripe';
+import { Link } from 'wouter';
 
 interface AnalyticsMetrics {
   activeStaff: number;
@@ -28,6 +33,8 @@ interface AnalyticsMetrics {
 }
 
 export default function Dashboard() {
+  const user = useUser();
+
   const { data: metrics, isLoading: metricsLoading } = useQuery<AnalyticsMetrics>({
     queryKey: ['/api/analytics/metrics'],
   });
@@ -35,6 +42,15 @@ export default function Dashboard() {
   const { data: recommendations, isLoading: recommendationsLoading } = useQuery<AiRecommendation[]>({
     queryKey: ['/api/recommendations', { isRead: false }],
   });
+
+  const { data: subscription } = useQuery({
+    queryKey: ["/api/stripe/subscription", user?.id],
+    queryFn: () => user?.id ? getSubscription(user.id) : Promise.resolve({ plan: "free", status: "inactive" }),
+    enabled: !!user?.id,
+  });
+
+  const currentPlan = subscription?.plan || "free";
+  const isPro = currentPlan === "pro" || currentPlan === "enterprise";
 
   const getRecommendationColor = (type: string) => {
     switch (type) {
@@ -91,6 +107,18 @@ export default function Dashboard() {
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
+              {isPro ? (
+                <div className="flex items-center space-x-2 bg-amber-50 px-3 py-2 rounded-lg" data-testid="badge-subscription-status">
+                  <Crown className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm font-medium text-amber-600 capitalize">{currentPlan} Plan</span>
+                </div>
+              ) : (
+                <Link href="/pricing">
+                  <a className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors" data-testid="link-upgrade">
+                    <span className="text-sm font-medium text-gray-600">Upgrade to Pro</span>
+                  </a>
+                </Link>
+              )}
               <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-lg">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-green-600">AI Active</span>
