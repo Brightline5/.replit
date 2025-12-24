@@ -11,6 +11,7 @@ import Staff from "./pages/staff";
 import Analytics from "./pages/analytics";
 import Predictions from "./pages/predictions";
 import Settings from "./pages/settings";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/not-found";
 import LoginPage from "./pages/Login";
 import Sidebar from "./components/sidebar";
@@ -35,6 +36,7 @@ function MainLayout() {
           <Route path="/analytics" component={Analytics} />
           <Route path="/predictions" component={Predictions} />
           <Route path="/settings" component={Settings} />
+          <Route path="/pricing" component={Pricing} />
           <Route component={NotFound} />
         </Switch>
       </div>

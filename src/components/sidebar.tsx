@@ -10,7 +10,8 @@ import {
   Brain, 
   Settings,
   Utensils,
-  LogOut
+  LogOut,
+  CreditCard
 } from "lucide-react";
 
 const navigation = [
@@ -19,6 +20,7 @@ const navigation = [
   { name: "Staff Management", href: "/staff", icon: Users },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "AI Predictions", href: "/predictions", icon: Brain },
+  { name: "Pricing", href: "/pricing", icon: CreditCard },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

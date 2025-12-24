@@ -142,3 +142,29 @@ export type AiRecommendation = typeof aiRecommendations.$inferSelect;
 export type InsertAiRecommendation = z.infer<
   typeof insertAiRecommendationSchema
 >;
+
+// Subscription schema for Stripe integration
+export const subscriptions = pgTable("subscriptions", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(), // Stack Auth user ID
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
+  status: text("status").notNull().default("inactive"), // active, inactive, canceled, past_due
+  plan: text("plan").notNull().default("free"), // free, pro, enterprise
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
