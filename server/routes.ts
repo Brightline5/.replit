@@ -3,8 +3,10 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertStaffSchema, insertShiftSchema, insertDemandForecastSchema, insertAiRecommendationSchema } from "../shared/schema";
 import { z } from "zod";
+import { stripeRouter } from "./stripe.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.use("/api/stripe", stripeRouter);
   // Auth routes
   app.post("/auth/login", (req, res) => {
     const { password } = req.body;
