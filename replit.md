@@ -2,7 +2,7 @@
 
 ## Overview
 
-RestaurantAI is a modern web application designed to optimize restaurant staff scheduling using AI-powered demand forecasting and intelligent recommendations. The system helps restaurant managers make data-driven decisions about staffing, reduce labor costs, and improve operational efficiency through predictive analytics.
+ is a modern web application designed to optimize restaurant staff scheduling using AI-powered demand forecasting and intelligent recommendations. The system helps restaurant managers make data-driven decisions about staffing, reduce labor costs, and improve operational efficiency through predictive analytics.
 
 ## User Preferences
 
