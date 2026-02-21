@@ -35,4 +35,11 @@ STACK_PROJECT_ID = "eb04e940-25a6-4888-85b6-041d6fdcf015"
 STACK_SECRET_SERVER_KEY = "ssk_4bd969p158b3bt944xwrna6t4z1semds3pnpj9ckzkzdr"
 SESSION_SECRET = "kjB0SdYtSeQRhe8hM2fCE3r/BdneNlhT7mtvu/QIruc="
 
+[userenv.development]
+VITE_STACK_PROJECT_ID = "eb04e940-25a6-4888-85b6-041d6fdcf015"
+VITE_STACK_PUBLISHABLE_CLIENT_KEY = "pck_w1cnvcv21maxm8vg4f2am232ec5w89xvzy2wv3jpwdxmg"
+STACK_PUBLISHABLE_CLIENT_KEY = "pck_w1cnvcv21maxm8vg4f2am232ec5w89xvzy2wv3jpwdxmg"
+STACK_PROJECT_ID = "eb04e940-25a6-4888-85b6-041d6fdcf015"
+STACK_SECRET_SERVER_KEY = "ssk_4bd969p158b3bt944xwrna6t4z1semds3pnpj9ckzkzdr"
+
 
