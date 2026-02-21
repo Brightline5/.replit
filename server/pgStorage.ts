@@ -1,6 +1,7 @@
 // server/pgStorage.ts
-import { Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import pg from "pg";
+const { Pool } = pg;
+import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, sql } from "drizzle-orm";
 import {
   staff as staffTable,
@@ -29,7 +30,7 @@ import type {
 import type { IStorage } from "./storage";
 
 export class PgStorage implements IStorage {
-  private pool: Pool;
+  private pool: InstanceType<typeof Pool>;
   private db: ReturnType<typeof drizzle>;
 
   constructor(databaseUrl: string) {

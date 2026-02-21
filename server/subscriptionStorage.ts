@@ -1,10 +1,11 @@
-import { Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import pg from "pg";
+const { Pool } = pg;
+import { drizzle } from "drizzle-orm/node-postgres";
 import { eq } from "drizzle-orm";
 import { subscriptions as subscriptionsTable, type Subscription, type InsertSubscription } from "../shared/schema";
 
 class SubscriptionStorage {
-  private pool: Pool | null = null;
+  private pool: InstanceType<typeof Pool> | null = null;
   private db: ReturnType<typeof drizzle> | null = null;
   private memoryStore: Map<string, Subscription> = new Map();
 

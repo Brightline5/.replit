@@ -255,8 +255,8 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date(),
       phone: insertStaff.phone || null,
-      availability: insertStaff.availability || {},
-      skills: insertStaff.skills || [],
+      availability: (insertStaff.availability || {}) as Staff["availability"],
+      skills: (insertStaff.skills || []) as Staff["skills"],
       isActive: insertStaff.isActive ?? true,
     };
     this.staff.set(id, staff);
@@ -267,7 +267,7 @@ export class MemStorage implements IStorage {
     const staff = this.staff.get(id);
     if (!staff) return undefined;
     
-    const updated = { ...staff, ...updates };
+    const updated = { ...staff, ...updates } as Staff;
     this.staff.set(id, updated);
     return updated;
   }
@@ -372,13 +372,13 @@ export class MemStorage implements IStorage {
 
   async createScheduleTemplate(insertTemplate: InsertScheduleTemplate): Promise<ScheduleTemplate> {
     const id = randomUUID();
-    const template: ScheduleTemplate = {
+    const template = {
       ...insertTemplate,
       id,
       createdAt: new Date(),
       description: insertTemplate.description || null,
       isDefault: insertTemplate.isDefault ?? false,
-    };
+    } as ScheduleTemplate;
     this.scheduleTemplates.set(id, template);
     return template;
   }
@@ -422,4 +422,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { PgStorage } from "./pgStorage";
+
+export const storage: IStorage = process.env.DATABASE_URL
+  ? new PgStorage(process.env.DATABASE_URL)
+  : new MemStorage();
