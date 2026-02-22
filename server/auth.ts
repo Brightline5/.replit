@@ -6,7 +6,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { MANAGER_PASSWORD = "changeme", SESSION_SECRET = "dev-session-secret", DATABASE_URL } = process.env;
+const { MANAGER_PASSWORD = "changeme", DATABASE_URL } = process.env;
+const isProduction = process.env.NODE_ENV === "production";
 
 if (!DATABASE_URL) {
   console.warn("WARNING: DATABASE_URL not set — sessions will not persist unless set.");
@@ -17,15 +18,20 @@ const pool = DATABASE_URL ? new pg.Pool({ connectionString: DATABASE_URL }) : nu
 const PgSession = connectPgSimple(session);
 const sessionStore = pool ? new PgSession({ pool: pool as any }) : undefined;
 
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  throw new Error("SESSION_SECRET environment variable is required");
+}
+
 export const sessionMiddleware = session({
   store: sessionStore,
-  secret: SESSION_SECRET,
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: isProduction,
     maxAge: 1000 * 60 * 60 * 8,
   },
 });

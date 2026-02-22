@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -11,10 +13,37 @@ declare module "express-session" {
 }
 
 const app = express();
+
+app.use(helmet());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later." },
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts, please try again in 15 minutes." },
+});
+
+app.use("/api", apiLimiter);
+app.use("/auth/login", loginLimiter);
+
 const isProduction = process.env.NODE_ENV === "production";
+
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  throw new Error("SESSION_SECRET environment variable is required");
+}
 
 let sessionStore;
 if (isProduction && process.env.DATABASE_URL) {
@@ -29,7 +58,7 @@ if (isProduction && process.env.DATABASE_URL) {
 app.use(
   session({
     store: sessionStore,
-    secret: process.env.SESSION_SECRET || "restaurant-ai-secret-key",
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {

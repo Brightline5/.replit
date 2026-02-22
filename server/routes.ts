@@ -4,6 +4,11 @@ import { storage } from "./storage";
 import { insertStaffSchema, insertShiftSchema, insertDemandForecastSchema, insertAiRecommendationSchema } from "../shared/schema";
 import { z } from "zod";
 import { stripeRouter } from "./stripe.js";
+import { requireManager } from "./auth.js";
+
+const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format, expected YYYY-MM-DD");
+const uuidSchema = z.string().uuid("Invalid ID format");
+const boolStringSchema = z.enum(["true", "false"]);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/stripe", stripeRouter);
@@ -40,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Staff routes
-  app.get("/api/staff", async (req, res) => {
+  app.get("/api/staff", requireManager, async (req, res) => {
     try {
       const staff = await storage.getStaff();
       res.json(staff);
@@ -49,7 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/staff/:id", async (req, res) => {
+  app.get("/api/staff/:id", requireManager, async (req, res) => {
     try {
       const staff = await storage.getStaffById(req.params.id);
       if (!staff) {
@@ -61,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/staff", async (req, res) => {
+  app.post("/api/staff", requireManager, async (req, res) => {
     try {
       const validatedData = insertStaffSchema.parse(req.body);
       const staff = await storage.createStaff(validatedData);
@@ -74,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/staff/:id", async (req, res) => {
+  app.put("/api/staff/:id", requireManager, async (req, res) => {
     try {
       const updates = insertStaffSchema.partial().parse(req.body);
       const staff = await storage.updateStaff(req.params.id, updates);
@@ -90,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/staff/:id", async (req, res) => {
+  app.delete("/api/staff/:id", requireManager, async (req, res) => {
     try {
       const success = await storage.deleteStaff(req.params.id);
       if (!success) {
@@ -103,12 +108,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Shift routes
-  app.get("/api/shifts", async (req, res) => {
+  app.get("/api/shifts", requireManager, async (req, res) => {
     try {
       const { date, staffId } = req.query;
+      const parsedDate = typeof date === 'string' ? dateSchema.safeParse(date) : null;
+      const parsedStaffId = typeof staffId === 'string' ? uuidSchema.safeParse(staffId) : null;
+      if (parsedDate && !parsedDate.success) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      if (parsedStaffId && !parsedStaffId.success) {
+        return res.status(400).json({ message: "Invalid staffId format" });
+      }
       const shifts = await storage.getShifts({
-        date: typeof date === 'string' ? date : undefined,
-        staffId: typeof staffId === 'string' ? staffId : undefined,
+        date: parsedDate?.success ? parsedDate.data : undefined,
+        staffId: parsedStaffId?.success ? parsedStaffId.data : undefined,
       });
       res.json(shifts);
     } catch (error) {
@@ -116,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/shifts", async (req, res) => {
+  app.post("/api/shifts", requireManager, async (req, res) => {
     try {
       const validatedData = insertShiftSchema.parse(req.body);
       const shift = await storage.createShift(validatedData);
@@ -129,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/shifts/:id", async (req, res) => {
+  app.put("/api/shifts/:id", requireManager, async (req, res) => {
     try {
       const updates = insertShiftSchema.partial().parse(req.body);
       const shift = await storage.updateShift(req.params.id, updates);
@@ -145,7 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/shifts/:id", async (req, res) => {
+  app.delete("/api/shifts/:id", requireManager, async (req, res) => {
     try {
       const success = await storage.deleteShift(req.params.id);
       if (!success) {
@@ -158,12 +171,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Demand forecast routes
-  app.get("/api/demand-forecasts", async (req, res) => {
+  app.get("/api/demand-forecasts", requireManager, async (req, res) => {
     try {
       const { start, end } = req.query;
       let dateRange;
       if (typeof start === 'string' && typeof end === 'string') {
-        dateRange = { start, end };
+        const parsedStart = dateSchema.safeParse(start);
+        const parsedEnd = dateSchema.safeParse(end);
+        if (!parsedStart.success || !parsedEnd.success) {
+          return res.status(400).json({ message: "Invalid date format" });
+        }
+        dateRange = { start: parsedStart.data, end: parsedEnd.data };
       }
       const forecasts = await storage.getDemandForecasts(dateRange);
       res.json(forecasts);
@@ -172,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/demand-forecasts", async (req, res) => {
+  app.post("/api/demand-forecasts", requireManager, async (req, res) => {
     try {
       const validatedData = insertDemandForecastSchema.parse(req.body);
       const forecast = await storage.createDemandForecast(validatedData);
@@ -186,10 +204,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI recommendations routes
-  app.get("/api/recommendations", async (req, res) => {
+  app.get("/api/recommendations", requireManager, async (req, res) => {
     try {
       const { isRead } = req.query;
-      const filters = isRead !== undefined ? { isRead: isRead === 'true' } : undefined;
+      let filters;
+      if (isRead !== undefined) {
+        const parsed = boolStringSchema.safeParse(isRead);
+        if (!parsed.success) {
+          return res.status(400).json({ message: "Invalid isRead value" });
+        }
+        filters = { isRead: parsed.data === 'true' };
+      }
       const recommendations = await storage.getAiRecommendations(filters);
       res.json(recommendations);
     } catch (error) {
@@ -197,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/recommendations", async (req, res) => {
+  app.post("/api/recommendations", requireManager, async (req, res) => {
     try {
       const validatedData = insertAiRecommendationSchema.parse(req.body);
       const recommendation = await storage.createAiRecommendation(validatedData);
@@ -210,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/recommendations/:id/read", async (req, res) => {
+  app.put("/api/recommendations/:id/read", requireManager, async (req, res) => {
     try {
       const recommendation = await storage.markRecommendationAsRead(req.params.id);
       if (!recommendation) {
@@ -223,7 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Analytics endpoints
-  app.get("/api/analytics/metrics", async (req, res) => {
+  app.get("/api/analytics/metrics", requireManager, async (req, res) => {
     try {
       const staff = await storage.getStaff();
       const today = new Date().toISOString().split('T')[0];
@@ -256,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Schedule optimization endpoint
-  app.post("/api/schedule/optimize", async (req, res) => {
+  app.post("/api/schedule/optimize", requireManager, async (req, res) => {
     try {
       const { date } = req.body;
       if (!date) {

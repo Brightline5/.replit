@@ -73,7 +73,7 @@ stripeRouter.post("/create-checkout-session", async (req, res) => {
     res.json({ sessionId: session.id, url: session.url });
   } catch (error: any) {
     console.error("Stripe checkout error:", error);
-    res.status(500).json({ error: error.message || "Failed to create checkout session" });
+    res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
 
@@ -99,7 +99,7 @@ stripeRouter.post("/create-portal-session", async (req, res) => {
     res.json({ url: session.url });
   } catch (error: any) {
     console.error("Stripe portal error:", error);
-    res.status(500).json({ error: error.message || "Failed to create portal session" });
+    res.status(500).json({ error: "Failed to create portal session" });
   }
 });
 
@@ -120,7 +120,7 @@ stripeRouter.get("/subscription/:userId", async (req, res) => {
     res.json(subscription);
   } catch (error: any) {
     console.error("Get subscription error:", error);
-    res.status(500).json({ error: error.message || "Failed to get subscription" });
+    res.status(500).json({ error: "Failed to get subscription" });
   }
 });
 

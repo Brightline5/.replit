@@ -106,7 +106,10 @@ export default function Pricing() {
       );
 
       if (url) {
-        window.location.href = url;
+        const parsed = new URL(url);
+        if (parsed.hostname === "checkout.stripe.com" || parsed.hostname === "billing.stripe.com") {
+          window.location.href = url;
+        }
       }
     } catch (error: any) {
       toast({
