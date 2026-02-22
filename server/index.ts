@@ -14,7 +14,11 @@ declare module "express-session" {
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
