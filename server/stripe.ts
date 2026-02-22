@@ -2,10 +2,9 @@ import Stripe from "stripe";
 import { Router, raw } from "express";
 import { subscriptionStorage } from "./subscriptionStorage.js";
 
-const stripeKey = process.env.STRIPE_SECRET_KEY;
-const stripe = stripeKey
-  ? new Stripe(stripeKey, { apiVersion: "2025-12-15.clover" as any })
-  : null;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2025-12-15.clover",
+});
 
 export const stripeRouter = Router();
 
@@ -16,10 +15,6 @@ const PRICE_IDS = {
 
 stripeRouter.post("/create-checkout-session", async (req, res) => {
   try {
-    if (!stripe) {
-      return res.status(503).json({ error: "Stripe is not configured. Please add STRIPE_SECRET_KEY." });
-    }
-
     const { userId, userEmail, plan } = req.body;
 
     if (!userId || !userEmail || !plan) {
@@ -84,10 +79,6 @@ stripeRouter.post("/create-checkout-session", async (req, res) => {
 
 stripeRouter.post("/create-portal-session", async (req, res) => {
   try {
-    if (!stripe) {
-      return res.status(503).json({ error: "Stripe is not configured" });
-    }
-
     const { userId } = req.body;
 
     if (!userId) {
@@ -137,10 +128,6 @@ stripeRouter.post(
   "/webhook",
   raw({ type: "application/json" }),
   async (req, res) => {
-    if (!stripe) {
-      return res.status(503).json({ error: "Stripe is not configured" });
-    }
-
     const sig = req.headers["stripe-signature"];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
